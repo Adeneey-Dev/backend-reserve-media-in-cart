@@ -1,0 +1,594 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Business {
+  id                   String           @id @default(uuid())
+  state                State            @relation(fields: [state_id], references: [state_id])
+  state_id             Int
+  country              Country          @relation(fields: [country_id], references: [id])
+  country_id           String
+  phone_number         String
+  business_name        String
+  project_manager      ProjectManager[]
+  business_category    BusinessCategory @relation(fields: [business_category_id], references: [id])
+  business_category_id String
+  business_industry    BusinessIndustry @relation(fields: [business_industry_id], references: [id])
+  business_industry_id String
+  created_at           DateTime         @default(now())
+  updated_at           DateTime         @updatedAt
+}
+
+model Audience {
+  id            String         @id @default(uuid())
+  name          String
+  audience_data AudienceData[]
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt
+}
+
+model AudienceData {
+  id          String   @id @default(uuid())
+  name        String
+  value       String[]
+  audience    Audience @relation(fields: [audience_id], references: [id])
+  audience_id String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}
+
+model BusinessCategory {
+  id         String     @id @default(uuid())
+  name       String
+  slug       String
+  admin      Business[]
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+}
+
+model BusinessIndustry {
+  id         String               @id @default(uuid())
+  type       BusinessIndustryType @relation(fields: [type_id], references: [id])
+  type_id    String
+  name       String
+  slug       String
+  admin      Business[]
+  created_at DateTime             @default(now())
+  updated_at DateTime             @updatedAt
+}
+
+model BusinessIndustryType {
+  id         String             @id @default(uuid())
+  slug       String
+  name       String
+  industry   BusinessIndustry[]
+  created_at DateTime           @default(now())
+  updated_at DateTime           @updatedAt
+}
+
+model Campaign {
+  id                      String                @id @default(uuid())
+  name                    String
+  media                   Media[]
+  media_id                String[]
+  creative                Creative              @relation(fields: [creative_id], references: [id])
+  creative_id             String
+  description             String
+  flight_date             DateTime?
+  campaign_goals          CampaignGoals[]
+  campaign_goals_id       String[]
+  project_manager         ProjectManager        @relation(fields: [project_manager_id], references: [id])
+  project_manager_id      String
+  expiration_date         DateTime?
+  campaign_tracking       CampaignTracking[]
+  campaign_identifier     String                @unique
+  campaign_tracking_state CampaignTrackingState @default(AWAITING)
+  created_at              DateTime              @default(now())
+  updated_at              DateTime              @updatedAt
+}
+
+model CampaignGoals {
+  id           String     @id @default(uuid())
+  name         String
+  slug         String
+  image        String
+  campaigns    Campaign[]
+  campaign_ids String[]   @default([])
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @updatedAt
+}
+
+model CampaignTracking {
+  id                           String                 @id @default(uuid())
+  state                        CampaignState          @default(AWAITING)
+  campaign                     Campaign               @relation(fields: [campaign_id], references: [id])
+  campaign_id                  String
+  completed_date               DateTime?
+  tracking_order               Int
+  tracking_status              CampaignTrackingStatus
+  awaiting_end_date            DateTime?
+  awaiting_start_date          DateTime?
+  processing_end_date          DateTime?
+  processing_start_date        DateTime?
+  requested_printing_photo     String?
+  requested_printing_video     String?
+  requested_installation_photo String?
+  requested_installation_video String?
+  payment                      Payment[]
+  created_at                   DateTime               @default(now())
+  updated_at                   DateTime               @updatedAt
+}
+
+model CreativeProductCategory {
+  id            String                              @id @default(uuid())
+  name          String
+  creatives     Creative[]
+  required_type CreativeProductCategoryApprovalType
+  created_at    DateTime                            @default(now())
+  updated_at    DateTime                            @updatedAt
+}
+
+model Creative {
+  id                  String                  @id @default(uuid())
+  name                String
+  image               String
+  status              CreativesStatus         @default(UPLOADED)
+  reason              String
+  payment             Payment[]
+  category            CreativeProductCategory @relation(fields: [category_id], references: [id])
+  campaign            Campaign[]
+  category_id         String
+  is_fast_tracked     Boolean
+  project_manager     ProjectManager          @relation(fields: [project_manager_id], references: [id])
+  project_manager_id  String
+  is_paid_for_vetting Boolean
+  created_at          DateTime                @default(now())
+  updated_at          DateTime                @updatedAt
+}
+
+model Country {
+  id            String         @id @default(uuid())
+  name          String
+  slug          String
+  state         State[]
+  business      Business[]
+  owner_profile OwnerProfile[]
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt
+}
+
+model FastTrack {
+  id              String        @id @default(uuid())
+  name            String
+  type            FastTrackType
+  amount          Int
+  amount_name     String
+  is_fast_tracked Boolean
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
+}
+
+model MediaType {
+  id         String   @id @default(uuid())
+  slug       String
+  type       String
+  media      Media[]
+  is_live    Boolean
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Manager {
+  id                String           @id @default(uuid())
+  name              String
+  image             String
+  email             String
+  phone             String
+  whatsapp          String
+  projects_managing ProjectManager[]
+  created_at        DateTime         @default(now())
+  updated_at        DateTime         @updatedAt
+}
+
+model Media {
+  id                      String        @id @default(uuid())
+  lat                     Float
+  lng                     Float
+  name                    String
+  order                   Order[]
+  state                   State         @relation(fields: [state_id], references: [id])
+  state_id                String
+  image                   String
+  width                   Int
+  venue                   Venue[]
+  venue_id                String[]
+  owner                   Owner         @relation(fields: [owner_id], references: [id])
+  owner_id                String
+  height                  Int
+  facing                  String
+  boards                  Int
+  address                 String
+  media_id                String        @unique
+  campaign                Campaign[]
+  campaign_id             String[]      @default([])
+  name_slug               String
+  media_type              MediaType     @relation(fields: [media_type_id], references: [id])
+  media_type_id           String
+  media_kind              MediaKind
+  is_available            Boolean
+  address_slug            String
+  booking_price           Int
+  order_in_cart           OrderInCart[]
+  printing_price          Int
+  booking_duration        TimeDuration
+  reservation_price       Int
+  installation_price      Int
+  creative_size_width     Int
+  creative_size_height    Int
+  printing_operator       String
+  printing_supervisor     String
+  installation_operator   String
+  installation_supervisor String
+  created_at              DateTime      @default(now())
+  updated_at              DateTime      @updatedAt
+}
+
+model Member {
+  id                 String           @id @default(uuid())
+  email              String           @unique
+  image              String?
+  terms              Boolean
+  is_admin           Boolean
+  password           String
+  last_name          String?
+  first_name         String?
+  signatures         String[]         @default([])
+  is_verified        Boolean
+  phone_number       String?
+  is_logged_in       Boolean
+  project_roles      ProjectRoles[]
+  project_roles_id   String[]
+  last_logged_in     DateTime
+  project_manager    ProjectManager[]
+  project_manager_id String[]
+  current_project    Project?         @relation(fields: [current_project_id], references: [id])
+  current_project_id String?
+  created_at         DateTime         @default(now())
+  updated_at         DateTime         @updatedAt
+}
+
+model TempMember {
+  id                 String           @id @default(uuid())
+  code               String
+  email              String           @unique
+  permission         MemberPermission
+  accept_invite      Boolean          @default(false)
+  project_manager    ProjectManager   @relation(fields: [project_manager_id], references: [id])
+  project_manager_id String
+  created_at         DateTime         @default(now())
+  updated_at         DateTime         @updatedAt
+}
+
+model Order {
+  id                 String         @id @default(uuid())
+  media              Media          @relation(fields: [media_id], references: [id])
+  status             OrderStatus
+  payment            Payment[]
+  duration           TimeDuration
+  media_id           String
+  signature          String?
+  start_date         DateTime
+  order_type         OrderType
+  expired_date       DateTime
+  duration_count     Int
+  signature_name     String?
+  project_manager    ProjectManager @relation(fields: [project_manager_id], references: [id])
+  project_manager_id String
+  created_at         DateTime       @default(now())
+  updated_at         DateTime       @updatedAt
+}
+
+model OrderInCart {
+  id                 String         @id @default(uuid())
+  media              Media          @relation(fields: [media_id], references: [id])
+  media_id           String
+  duration           String
+  start_date         DateTime
+  expired_date       DateTime
+  duration_count     Int
+  project_manager    ProjectManager @relation(fields: [project_manager_id], references: [id])
+  project_manager_id String
+  order_is_available Boolean
+  created_at         DateTime       @default(now())
+  updated_at         DateTime       @updatedAt
+}
+
+model Payment {
+  id                   String            @id @default(uuid())
+  orders               Order?            @relation(fields: [orders_id], references: [id])
+  amount               Int
+  orders_id            String?
+  creative             Creative?         @relation(fields: [creative_id], references: [id])
+  creative_id          String?
+  reference            String
+  description          String
+  payment_type         PaymentType
+  project_manager      ProjectManager    @relation(fields: [project_manager_id], references: [id])
+  project_manager_id   String
+  campaign_tracking    CampaignTracking? @relation(fields: [campaign_tracking_id], references: [id])
+  campaign_tracking_id String?
+  created_at           DateTime          @default(now())
+  updated_at           DateTime          @updatedAt
+}
+
+model Project {
+  id                          String          @id @default(uuid())
+  name                        String
+  icon                        ProjectIcon     @relation(fields: [icon_id], references: [id])
+  icon_id                     String
+  project_manager             ProjectManager?
+  created_at                  DateTime        @default(now())
+  updated_at                  DateTime        @updatedAt
+  member_currently_on_project Member[]
+}
+
+model ProjectIcon {
+  id         String    @id @default(uuid())
+  image      String
+  project    Project[]
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+}
+
+model ProjectManager {
+  id          String           @id @default(uuid())
+  cart        OrderInCart[]
+  roles       ProjectRoles[]
+  story       ProjectStory[]
+  history     ProjectHistory[]
+  members     Member[]
+  members_id  String[]
+  project     Project          @relation(fields: [project_id], references: [id])
+  project_id  String           @unique
+  manager     Manager          @relation(fields: [manager_id], references: [id])
+  manager_id  String
+  business    Business         @relation(fields: [business_id], references: [id])
+  business_id String
+  payments    Payment[]
+  campaigns   Campaign[]
+  creatives   Creative[]
+  temp_member TempMember[]
+  media_order Order[]
+  created_at  DateTime         @default(now())
+  updated_at  DateTime         @updatedAt
+}
+
+model ProjectRoles {
+  id                 String         @id @default(uuid())
+  role               Roles          @relation(fields: [role_id], references: [id])
+  role_id            String
+  members            Member[]
+  members_id         String[]
+  project_manager    ProjectManager @relation(fields: [project_manager_id], references: [id])
+  project_manager_id String
+  created_at         DateTime       @default(now())
+  updated_at         DateTime       @updatedAt
+}
+
+model ProjectHistory {
+  id                 String         @id @default(uuid())
+  history            String
+  project_manager    ProjectManager @relation(fields: [project_manager_id], references: [id])
+  project_manager_id String
+  created_at         DateTime       @default(now())
+  updated_at         DateTime       @updatedAt
+}
+
+model ProjectStory {
+  id                 String         @id @default(uuid())
+  story              String
+  project_manager    ProjectManager @relation(fields: [project_manager_id], references: [id])
+  project_manager_id String
+  created_at         DateTime       @default(now())
+  updated_at         DateTime       @updatedAt
+}
+
+model Roles {
+  id           String           @id @default(uuid())
+  name         String
+  type         RoleType
+  orders       Boolean
+  reports      Boolean
+  location     Boolean
+  audience     Boolean
+  campaign     Boolean
+  dashboard    Boolean
+  creatives    Boolean
+  created_by   RoleCreatedState
+  project_role ProjectRoles[]
+  created_at   DateTime         @default(now())
+  updated_at   DateTime         @updatedAt
+}
+
+model Owner {
+  id                 String        @id @default(uuid())
+  email              String        @unique
+  media              Media[]
+  terms              Boolean
+  profile            OwnerProfile?
+  password           String
+  is_verified        Boolean
+  is_logged_in       Boolean
+  last_logged_in     DateTime
+  is_set_up_complete Boolean
+  created_at         DateTime      @default(now())
+  updated_at         DateTime      @updatedAt
+}
+
+model OwnerProfile {
+  id                         String   @id @default(uuid())
+  owner                      Owner    @relation(fields: [owner_id], references: [id])
+  owner_id                   String   @unique
+  country                    Country  @relation(fields: [country_id], references: [id])
+  country_id                 String   @unique
+  bank_name                  String
+  last_name                  String
+  first_name                 String
+  company_name               String
+  account_number             String   @unique
+  business_state             State    @relation("business_state", fields: [business_state_id], references: [state_id])
+  business_state_id          Int
+  media_owner_state          State    @relation("media_owner_state", fields: [media_owner_state_id], references: [state_id])
+  media_owner_state_id       Int
+  business_licence_number    String   @unique
+  business_local_government  String
+  media_owner_license_number String   @unique
+  business_licence_cerficate String
+  created_at                 DateTime @default(now())
+  updated_at                 DateTime @updatedAt
+}
+
+model State {
+  id                   String         @id @default(uuid())
+  lgas                 String[]
+  name                 String
+  slug                 String
+  media                Media[]
+  country              Country        @relation(fields: [country_id], references: [id])
+  country_id           String
+  state_id             Int            @unique
+  business             Business[]
+  media_owner          OwnerProfile[] @relation("media_owner_state")
+  media_owner_business OwnerProfile[] @relation("business_state")
+  created_at           DateTime       @default(now())
+  updated_at           DateTime       @updatedAt
+}
+
+model TempHoldAdvertiserAuth {
+  id              String   @id @default(uuid())
+  is_used         Boolean  @default(false)
+  business        String   @unique
+  creating_member String   @unique
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+}
+
+model Venue {
+  id         String   @id @default(uuid())
+  venue      String
+  media      Media[]
+  media_id   String[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+// Enums remain the same as in your original schema
+enum CreativesStatus {
+  APPROVED
+  PENDING
+  REJECTED
+  UPLOADED
+  EXEMPTED
+}
+
+enum CreativeProductCategoryApprovalType {
+  EXEMPTED
+  REQUIRED
+}
+
+enum FastTrackType {
+  FAST_TRACK_CREATIVE
+  FAST_TRACK_VET_CAMPAIGN_CREATIVE
+}
+
+enum MemberPermission {
+  CAN_VIEW
+  CAN_MODIFY
+}
+
+enum MediaKind {
+  STATIC
+  DIGITAL
+}
+
+enum OrderStatus {
+  RESERVED
+  PAID
+  EXPIRED
+}
+
+enum OrderType {
+  RESERVED
+  PAID
+}
+
+enum RoleType {
+  ADMIN
+  OWNER
+  MEMBER_VIEW
+  MEMBER_MODIFY
+  CUSTOM
+}
+
+enum RoleCreatedState {
+  CUSTOM
+  SYSTEM
+}
+
+enum PaymentType {
+  REGULAR_CREATIVE
+  FAST_TRACK_CREATIVE
+  BUY_MEDIA
+  RESERVE_MEDIA
+  VET_CAMPAIGN
+}
+
+enum CampaignTrackingStatus {
+  VETTING
+  PRINTING
+  INSTALLATION
+}
+
+enum CampaignState {
+  AWAITING
+  PROCESSING
+  COMPLETED
+}
+
+enum CampaignTrackingState {
+  AWAITING
+  VETTING
+  APPROVED
+  PRINTING
+  PRINTED
+  INSTALLING
+  INSTALLED
+}
+
+enum MediaDirection {
+  NORTH
+  NORTH_EAST
+  EAST
+  SOUTH_EAST
+  SOUTH
+  SOUTH_WEST
+  WEST
+  NORTH_WEST
+}
+
+enum TimeDuration {
+  DAY
+  WEEK
+  MONTH
+}
