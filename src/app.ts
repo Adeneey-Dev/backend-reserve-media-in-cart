@@ -3,6 +3,8 @@ import express, { Express } from 'express';
 import loggerPromise from './utils/logger';
 import { getAppConfig } from './utils/config';
 import { prismaClient } from './utils/database';
+/* ROUTER IMPORT */
+import indexRouter from './routes/index.route';
 
 const app: Express = express();
 
@@ -35,6 +37,8 @@ const startServer: () => Promise<void> = async (): Promise<void> => {
                 res.status(500).send('Something broke!');
             }
         );
+
+        app.use('/', indexRouter);
 
         app.listen(config.port, () => {
             logger.info(`Server is running on http://localhost:${config.port}`);
