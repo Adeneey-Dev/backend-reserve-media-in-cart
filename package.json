@@ -1,36 +1,40 @@
 {
-  "name": "flashboord_backend",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
-  "scripts": {
-    "build": "tsc",
-    "start": "node dist/app.js",
-    "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/app.ts",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "format:check": "prettier --check \"src/**/*.ts\"",
-    "lint": "eslint . --ext .ts"
-  },
-  "dependencies": {
-    "@prisma/client": "6.11.1",
-    "date-fns": "^4.1.0",
-    "express": "^5.1.0",
-    "js-yaml": "^4.1.0",
-    "pg": "^8.16.3",
-    "winston": "^3.17.0",
-    "winston-daily-rotate-file": "^5.0.0"
-  },
-  "devDependencies": {
-    "@types/express": "^5.0.3",
-    "@types/js-yaml": "^4.0.9",
-    "@types/node": "^24.0.13",
-    "@types/pg": "^8.15.4",
-    "eslint-config-prettier": "^10.1.5",
-    "eslint-plugin-prettier": "^5.5.1",
-    "nodemon": "^3.1.10",
-    "prettier": "^3.6.2",
-    "prisma": "^6.11.1",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
-  }
+    "name": "flashboord_backend",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "scripts": {
+        "build": "tsc",
+        "start": "node dist/app.js",
+        "dev": "nodemon --watch 'src/**/*.ts' --exec ts-node src/app.ts",
+        "format": "prettier --write \"src/**/*.ts\"",
+        "format:check": "prettier --check \"src/**/*.ts\"",
+        "lint": "eslint . --ext .ts"
+    },
+    "dependencies": {
+        "@prisma/client": "6.11.1",
+        "axios": "^1.11.0",
+        "date-fns": "^4.1.0",
+        "dotenv": "^17.2.1",
+        "express": "^5.1.0",
+        "js-yaml": "^4.1.0",
+        "pg": "^8.16.3",
+        "uuid": "^11.1.0",
+        "winston": "^3.17.0",
+        "winston-daily-rotate-file": "^5.0.0"
+    },
+    "devDependencies": {
+        "@types/express": "^5.0.3",
+        "@types/js-yaml": "^4.0.9",
+        "@types/node": "^24.0.13",
+        "@types/pg": "^8.15.4",
+        "@types/uuid": "^10.0.0",
+        "eslint-config-prettier": "^10.1.5",
+        "eslint-plugin-prettier": "^5.5.1",
+        "nodemon": "^3.1.10",
+        "prettier": "^3.6.2",
+        "prisma": "^6.11.1",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.8.3"
+    }
 }
