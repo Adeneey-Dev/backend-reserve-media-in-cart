@@ -2,16 +2,17 @@ import { Request, Response } from 'express';
 import axios from 'axios';
 import { prisma } from '../prisma/client';
 import { v4 as uuidv4 } from 'uuid';
+import { sendInvoiceEmail } from '../utils/mailer';
 
 // PAYSTACK base URL
 const PAYSTACK_BASE_URL = 'https://api.paystack.co';
 
 export const initiatePayment = async (req: Request, res: Response) => {
     try {
-        const { email, amount, projectManagerId } = req.body;
+        const { userEmail, amount, projectManagerId } = req.body;
 
-        if (!amount || !projectManagerId) {
-            return res.status(400).json({ message: 'Missing amount or projectManagerId' });
+        if (!userEmail || !amount || !projectManagerId) {
+            return res.status(400).json({ message: 'Missing email, amount or projectManagerId' });
         }
 
         // Create unique reference (invoiceRef)
@@ -34,7 +35,7 @@ export const initiatePayment = async (req: Request, res: Response) => {
         const paystackResponse = await axios.post(
             `${PAYSTACK_BASE_URL}/transaction/initialize`,
             {
-                email: email,
+                email: userEmail,
                 amount: amount * 100,
                 reference: invoiceRef,
                 callback_url: 'http://localhost:2100/api/payment/callback',
@@ -49,8 +50,11 @@ export const initiatePayment = async (req: Request, res: Response) => {
 
         const paymentUrl = paystackResponse.data.data.authorization_url;
 
+        // Send invoice email
+        await sendInvoiceEmail(userEmail, invoiceRef, amount, paymentUrl);
+
         return res.status(200).json({
-            message: 'Payment initiated',
+            message: 'Payment initiated Successfully',
             payment,
             paymentUrl,
         });
