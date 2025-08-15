@@ -27,7 +27,7 @@ It ensures:
 - **Backend Framework:** TypeScript + Node.js + Express.js
 - **Database:** PostgreSQL + Prisma ORM
 - **Payments:** Paystack API
-- **SendMail invoice using nodemailer
+- SendMail invoice using nodemailer
 - **Validation:** Custom middleware
 - **Version Control:** Git & GitHub
 
