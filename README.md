@@ -16,7 +16,7 @@ It ensures:
 - **Reserve media** for a limited time until payment
 - **Prevent double booking** via availability locks
 - **Integrate payments** via Paystack
-- **Add, Edit and Remove reservation from cart
+- **Add, Edit and Remove reservation from cart**
 - **Automatic cart clearing** after successful purchase
 - **Webhook handling** for automated payment confirmation
 - **Cart expiry** if payment is not made in a set time frame
