@@ -31,6 +31,11 @@ It ensures:
 - **Validation:** Custom middleware
 - **Version Control:** Git & GitHub
 
+
+**Author:** Adeneey_Dev
+**Email:** Oyewolesaheed638@gmail.com
+
+
 ---
 
 
