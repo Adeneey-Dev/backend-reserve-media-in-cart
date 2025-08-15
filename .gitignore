@@ -4,3 +4,7 @@
 /src/generated/prisma
 
 .env
+
+config.yaml
+README.md
+
